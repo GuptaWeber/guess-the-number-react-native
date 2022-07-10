@@ -19,7 +19,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         padding: 12,
         margin: 12,
-        elevation: 4
+        elevation: 4,
+        alignSelf: 'stretch'
     },
     number:{
         fontFamily: 'open-sans'
