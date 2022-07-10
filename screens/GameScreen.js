@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { View, StyleSheet, Text, Alert } from "react-native";
+import { useEffect, useState } from "react";
+import { View, StyleSheet, Text, Alert, FlatList } from "react-native";
 import Card from "../components/Card";
 import InstructionText from "../components/InstructionText";
 import PrimaryButton from "../components/PrimaryButton";
 import Title from "../components/Title";
 import Colors from "../constants/colors";
 import Ionicons from '@expo/vector-icons/Ionicons';
+import GuessLogItem from "../components/GuessLogItem";
 
 function randomNumberBetween(min, max, exclude) {
   const randomNumber = parseInt(Math.random() * (max - min) + min);
@@ -18,10 +19,16 @@ function randomNumberBetween(min, max, exclude) {
 let minBoundary = 1;
 let maxBoundary = 100;
 
-export default function GameScreen({ picked, setGameOver }) {
+export default function GameScreen({ picked, setGameOver, setGuessRoundsNumber }) {
   const [currentGuess, setCurrentGuess] = useState(
     randomNumberBetween(1, 100, picked)
   );
+  const [guessRounds, setGuessRounds] = useState([{guess: currentGuess, key: new Date().getUTCMilliseconds().toString()}]);
+
+  useEffect(() => {
+    minBoundary = 1,
+    maxBoundary = 100
+  }, [])
 
   function nextGuessHandler(direction) {
     if (
@@ -45,9 +52,11 @@ export default function GameScreen({ picked, setGameOver }) {
     const random = randomNumberBetween(minBoundary, maxBoundary, currentGuess);
     console.log(random, picked);
     if (random === picked) {
+      setGuessRoundsNumber(guessRounds.length);
       setGameOver(true);
     } else {
       setCurrentGuess(random);
+      setGuessRounds(prevGuessRounds => [{guess: random, key: new Date().getUTCMilliseconds().toString()}, ...prevGuessRounds]);
     }
   }
 
@@ -72,6 +81,7 @@ export default function GameScreen({ picked, setGameOver }) {
           </View>
         </View>
       </Card>
+      <FlatList data={guessRounds} renderItem={ ({index, item}) => <GuessLogItem round={guessRounds.length - index} guess={item.guess} />} />
     </View>
   );
 }
